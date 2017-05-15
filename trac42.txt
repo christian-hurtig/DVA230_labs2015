@@ -1,0 +1,170 @@
+%start stmt_list
+
+%token RETURN
+%token IF
+%token ELSE
+%token WHILE
+%token WRITE
+%token READ
+%token VOID
+%token INT
+%token LBRACE
+%token RBRACE
+%token LPAR
+%token RPAR
+%token SEMI
+%token COMMA
+%token ASSOP
+%token ADDOP
+%token SUBOP
+%token MULTOP
+%token DIVOP
+%token NOTOP
+%token EQOP
+%token LTOP
+%token LEOP
+%token ID
+%token NUM
+
+%%
+
+
+
+/* *********************** GENERAL *************************** */
+
+stmt_list
+	: stmt stmt_list
+	|
+	;
+
+stmt
+	: type ID decl_opt
+	| expr SEMI
+	| RETURN return_opt SEMI
+	| WRITE expr SEMI
+	| READ expr SEMI
+	| IF LPAR expr RPAR stmt else_opt
+	| WHILE LPAR expr RPAR stmt
+	| LBRACE stmt_list RBRACE
+	;
+
+else_opt
+	: ELSE stmt
+	|
+	;
+	
+type
+	: VOID
+	| INT
+	;
+	
+decl_opt
+	: ASSOP expr SEMI
+	| SEMI
+	| LPAR par_list RPAR LBRACE stmt_list RBRACE
+	;
+
+	
+	
+/* *********************** FUNCTIONS *************************** */
+	
+return_opt
+	: expr
+	|
+	;
+	
+call_opt
+	: LPAR arg_list RPAR
+	|
+	;
+	
+par_list
+	: par par_list_opt
+	;
+	
+par_list_opt
+	: COMMA par par_list_opt
+	|
+	;
+	
+par
+	: VOID
+	| INT ID
+	;
+	
+arg_list
+	: expr arg_list_opt
+	|
+	;
+	
+arg_list_opt
+	: COMMA expr arg_list_opt
+	|
+	;
+	
+	
+	
+/* *********************** EXPRESSIONS *************************** */
+	
+expr
+	: expr1 expr_ass_opt
+	;
+	
+expr_ass_opt
+	: ASSOP expr1 expr_ass_opt
+	|
+	;
+	
+expr1
+	: expr2 expr_eq_opt
+	;
+	
+expr_eq_opt
+	: EQOP expr2 expr_eq_opt
+	|
+	;
+	
+expr2
+	: expr3 expr_comp_opt
+	;
+	
+expr_comp_opt
+	: LTOP expr3 expr_comp_opt
+	| LEOP expr3 expr_comp_opt
+	|
+	;
+	
+expr3
+	: expr4 expr_add_opt
+	;
+	
+expr_add_opt
+	: ADDOP expr4 expr_add_opt
+	| SUBOP expr4 expr_add_opt
+	|
+	;
+	
+expr4
+	: expr5 expr_mul_opt
+	;
+	
+expr_mul_opt
+	: MULTOP expr5 expr_mul_opt
+	| DIVOP expr5 expr_mul_opt
+	|
+	;
+
+expr5
+	: expr6 expr_noteq_opt
+	;
+
+expr_noteq_opt
+	: NOTOP expr6 expr_noteq_opt
+	|
+	;
+	
+expr6
+	: NUM
+	| ID call_opt
+	| LPAR expr RPAR
+	;
